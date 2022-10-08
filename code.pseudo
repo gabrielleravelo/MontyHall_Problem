@@ -30,25 +30,57 @@ BEGIN
 			SET game.doors TO [];
 			FOR (SET i FROM 0 TO 3; INCREMENT i)
 				SET newdoor TO new Door(i);
-				
+				SET game.doors.push(newdoor);
+			END FOR
 
-	
-	
-	INIT Game, Door and Statistics
-    	SELECT randomly a doorcar
-		SELECT number randomly
-		PUT a car behind the door with number selected
-		PUT a goat behind others
-	FIRST PICK a door by gamer
-	OPEN a goat door
-		IF door first pick IS NOT EQUAL to door selected THEN
-			OPEN a goat door
-		ELSE
-			OPEN a random goat door
-		END IF
-	FINAL PICK door by gamer
-		IF door final pick IS EQUAL to door selected THEN
-			PRINT "You are the winner"
-		ELSE
-			PRINT "You lose the game"
-		END IF
+			DEFINE function randomIndex;
+
+			SET carDoor TO game.doors[randomIndex];
+
+			SET game.doorPicked TO game.doors[randomIndex];
+
+			SEQUENCE OPEN a goat door
+				SET goatDoor TO game.doors.filter (obj.isCar EQUAL TO false);
+				SET goatNumber TO randomIndex(goatDoor.length);
+				SET game.openedGoatDoor TO goatDoor[goatNumber];
+				IF game.doorPicked EQUAL TO game.openedGoatDoor THEN
+					game.openedGoatDoor EQUAL TO goatDoor[+!goatNumber];
+				END IF
+			END SEQUENCE
+
+			SEQUENCE OPEN a final pick door
+				SET closeDoor EQUAL TO game.doors.filter(obj.number IS NOT game.openedGoatDoor.number);
+    			SET closeNumber EQUAL TO randomIndex(closeDoor.length);
+    			SET game.finalPick EQUAL TO closeDoor[closeNumber];
+			END SEQUENCE
+
+			SEQUENCE statistic data
+				IF game.finalPick IS EQUAL TO carDoor THEN
+        			game.won EQUAL TO true;
+    
+				IF game.finalPick IS EQUAL TO game.doorPicked AND game.won THEN
+					INCREMENT stat.gamesWithSameDoorWon;
+					
+				IF game.finalPick IS EQUAL TO game.doorPicked AND IS NOT game.won THEN
+					INCREMENT stat.gamesWithSameDoorLost;    
+					
+				IF game.finalPick IS NOT EQUAL TO game.doorPicked AND game.won THEN
+					INCREMENT stat.gamesWithDoorChangeWon;
+					
+				IF game.finalPick IS NOT EQUAL TO game.doorPicked AND IS NOT game.won THEN
+					INCREMENT stat.gamesWithDoorChangeLost;
+			END SEQUENCE
+		END FOR
+	END SEQUENCE
+
+			SEQUENCE statistic result
+				SET stayWin EQUAL TO ((stat.gamesWithSameDoorWon MULTIPLY BY 100) DIVIDE BY (stat.gamesWithSameDoorWon ADD TO stat.gamesWithSameDoorLost)).toFixed(2);
+				SET switchWin EQUAL TO ((stat.gamesWithDoorChangeWon MULTIPLY BY 100) DIVIDE (stat.gamesWithDoorChangeWon ADD TO stat.gamesWithDoorChangeLost)).toFixed(2);
+			END SEQUENCE
+
+			SEQUENCE Display result
+				SET console.log(stayWin + " % of games won when not swicthing door.");
+				SET console.log(switchWin + " % of games won when swicthing door.");
+			END SEQUENCE
+		
+END
