@@ -1,0 +1,54 @@
+BEGIN
+    SEQUENCE Statistics constructor()
+		SET gamesWithSameDoorWon;
+		SET gamesWithDoorChangeWon;
+	END SEQUENCE
+	
+	SEQUENCE Game constructor()
+       	SET doors;
+		SET doorPicked;
+		SET openedGoatDoor;
+		SET finalPick;
+		SET won;
+	END SEQUENCE
+
+	SEQUENCE Door constructor(number)
+       	SET number;
+		SET isCar;
+		SET opened;
+	END SEQUENCE
+	
+	SEQUENCE  OPEN a new game
+		SET nbSimulation;
+		SET stat TO new Statistics;
+		SET stat.gamesWithSameDoorWon TO 0;
+		SET stat.gamesWithDoorChangeWon TO 0;
+
+		FOR ( SET j FROM 0 TO nbSimulation; INCREMENT j)
+			SET game TO new Game();
+			SET newdoor;
+			SET game.doors TO [];
+			FOR (SET i FROM 0 TO 3; INCREMENT i)
+				SET newdoor TO new Door(i);
+				
+
+	
+	
+	INIT Game, Door and Statistics
+    	SELECT randomly a doorcar
+		SELECT number randomly
+		PUT a car behind the door with number selected
+		PUT a goat behind others
+	FIRST PICK a door by gamer
+	OPEN a goat door
+		IF door first pick IS NOT EQUAL to door selected THEN
+			OPEN a goat door
+		ELSE
+			OPEN a random goat door
+		END IF
+	FINAL PICK door by gamer
+		IF door final pick IS EQUAL to door selected THEN
+			PRINT "You are the winner"
+		ELSE
+			PRINT "You lose the game"
+		END IF
